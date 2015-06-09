@@ -1,0 +1,14 @@
+@import url(https://fonts.googleapis.com/css?family=Montserrat:700);
+
+@font-face {
+  font-family: "Bariol";
+  font-style: normal;
+  font-weight: 400;
+  src: url("../fonts/Bariol_Regular.otf") format("opentype");
+}
+
+body {
+  background-color: #fafafa;
+  font-family: 'Bariol';
+  font-size: 1.5em;
+}

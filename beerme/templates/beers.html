@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block title %}Beer orders{% endblock %}
+{% block content %}
+    <div class="container">
+        <h1>Bets</h1>
+        <table class="table">
+            <thead>
+                <td>id</td>
+                <td>brew</td>
+                <td>table</td>
+                <td>name</td>
+                <td>price satoshis</td>
+                <td>address</td>
+                <td>txid</td>
+                <td>paid</td>
+                <td>processed</td>
+            </thead>
+            {% for beer in beers %}
+            <tr>
+                <td>{{beer['id']}}</td>
+                <td>{{beer['brew']}}</td>
+                <td>{{beer['table']}}</td>
+                <td>{{beer['name']}}</td>
+                <td>{{beer['price_satoshis']}}</td>
+                <td>{{beer['address']}}</td>
+                <td>{{beer['txid']}}</td>
+                <td>{{beer['paid']}}</td>
+                <td>{{beer['processed']}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}

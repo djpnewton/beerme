@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+{% block title %}Beer order{% endblock %}
+{% block content %}
+    <div class="container">
+        <h1>Pay for your beer</h1>
+        Order for {{beer.brew}} to table {{beer.table}}</br>
+        Price is {{price_btc}} BTC</br>
+        <img class="center-block" src="{{data_uri}}"/></br>
+        <p class="text-center">
+            <a href="bitcoin:{{beer.address}}?amount={{price_btc}}&message={{beer.brew}}">{{beer.address}}</a>
+        </p>
+        <img class="center-block" src="/static/images/ajax-loader.gif"/></br>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="payment-reveal" tabindex="-1" role="dialog" aria-labelledby="payment-reveal-label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="payment-reveal-label">Payment received...</h4>
+                </div>
+                <div class="modal-body">
+                    <img class="center-block" width="300px" src="/static/images/loop-roulette.gif" id="payment-reveal-image"/>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var ws_url = 'wss://ws.blockchain.info/inv';
+        var sock = new WebSocket(ws_url);
+        sock.onopen = function() {
+            console.log('open');
+            sock.send('{"op":"addr_sub", "addr":"{{beer.address}}"}');
+        };
+        sock.onmessage = function(e) {
+            var data = e.data;
+            console.log('message', data);
+            var obj = JSON.parse(data);
+            for (var i = 0; i < obj['x']['out'].length; i++) {
+                var out = obj['x']['out'][i];
+                if (out['addr'] == '{{address}}') {
+                    var msg = 'received ' + out['amount'] + ' satoshis (' + obj['x']['hash'] + ')';
+                    $('#payment-reveal-label').text('Payment received...');
+                    $('#payment-reveal-image').attr('src', '/static/images/loop-roulette.gif');
+                    $('#payment-reveal').modal();
+
+                }
+            }
+        };
+        sock.onclose = function() {
+            console.log('close');
+        };
+    </script>
+{% endblock %}

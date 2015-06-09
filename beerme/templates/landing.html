@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block title %}Beer me up scotty{% endblock %}
+{% block content %}
+    <a id="intro"></a>
+
+    <!-- Page Content -->
+    <div class="content-section-a">
+
+        <div class="container">
+
+            <div class="row">
+                <form action="/beer">
+                    <input type="hidden" name="brew" value="Pilsner"/>
+                    <input name="table" placeholder="table number" required/>
+                    <input name="name" placeholder="name" required/>
+                    <input type="submit" value="Order Pilsner"/>
+                </form>
+            </div>
+
+            <div class="row">
+                <form action="/beer">
+                    <input type="hidden" name="brew" value="Stout"/>
+                    <input name="table" placeholder="table number" required/>
+                    <input name="name" placeholder="name" required/>
+                    <input type="submit" value="Order Stout"/>
+                </form>
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.content-section-a -->
+
+{% endblock %}
