@@ -2,7 +2,7 @@ from flask import url_for, session, request, render_template, redirect, flash, j
 import decimal
 
 import beerme
-from beerme import app, config
+from beerme import app, config, csrf
 from beerme import User, Beer
 import utils
 
@@ -82,7 +82,8 @@ def beer_specific(guid):
     data_uri = 'data:image/png;base64,%s' % img_data_b64
     return render_template('beer.html', beer=beer, price_btc=price_btc, data_uri=data_uri)
 
-@app.route('/payment')
+@csrf.exempt
+@app.route('/payment', methods=['POST'])
 def payment():
     beerme.beer_payment(request)
     return '*ok*'

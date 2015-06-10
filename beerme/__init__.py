@@ -134,11 +134,12 @@ def beer_add(brew, table, name, price_satoshis):
 def beer_payment(req):
     json = req.get_json(force=True)
     satoshis = json['value']
-    address = json['destination_address']
+    address = json['input_address']
     txid = json['input_transaction_hash']
     guid = req.args.get('beer_guid')
     secret = req.args.get('secret')
     print 'satoshis:', satoshis
+    print 'address:', address
     print 'txid:', txid
     print 'guid:', guid
     print 'secret:', secret
@@ -150,10 +151,10 @@ def beer_payment(req):
         print 'invalid beer guid'
         return
     if address != beer.address:
-        print 'invalid address'
+        print 'invalid address (should be %s)' % beer.address
         return
-    if satoshis < beer.price_satoshis:
-        print 'payment insufficient'
+    if satoshis < beer.price_satoshis - config.main.payment_txcost_threshold:
+        print 'payment insufficient (should be %s)' % (beer.price_satoshis - config.main.payment_txcost_threshold)
         return
     beer.txid = txid
     beer.paid = True
