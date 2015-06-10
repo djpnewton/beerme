@@ -20,7 +20,7 @@
                     <h4 class="modal-title" id="payment-reveal-label">Payment received...</h4>
                 </div>
                 <div class="modal-body">
-                    <img class="center-block" width="300px" src="/static/images/loop-roulette.gif" id="payment-reveal-image"/>
+                    <img class="center-block" width="300px" src="/static/images/beer-drink.gif" id="payment-reveal-image"/>
                 </div>
             </div>
         </div>
@@ -32,17 +32,25 @@
         sock.onopen = function() {
             console.log('open');
             sock.send('{"op":"addr_sub", "addr":"{{beer.address}}"}');
+            setInterval(function() {
+                // keep alive
+                sock.send('{"op":"addr_sub", "addr":"{{beer.address}}"}');
+                }, 20000);
+        };
+        sock.onerror = function(e) {
+            console.log('connection.onerror', e);
         };
         sock.onmessage = function(e) {
             var data = e.data;
             console.log('message', data);
             var obj = JSON.parse(data);
-            for (var i = 0; i < obj['x']['out'].length; i++) {
-                var out = obj['x']['out'][i];
-                if (out['addr'] == '{{address}}') {
-                    var msg = 'received ' + out['amount'] + ' satoshis (' + obj['x']['hash'] + ')';
+            for (var i = 0; i < obj.x.out.length; i++) {
+                var out = obj.x.out[i];
+                if (out['addr'] == '{{beer.address}}') {
+                    var msg = 'received ' + out.value + ' satoshis (' + obj.x.hash + ')';
+                    console.log('{{beer.address}}', msg);
                     $('#payment-reveal-label').text('Payment received...');
-                    $('#payment-reveal-image').attr('src', '/static/images/loop-roulette.gif');
+                    $('#payment-reveal-image').attr('src', '/static/images/beer-drink.gif');
                     $('#payment-reveal').modal();
 
                 }

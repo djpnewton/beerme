@@ -13,6 +13,7 @@ def qrcode_png_buffer(qr):
     return buf
 
 def send_email(config, email, subject, body):
+    print 'sending email to %s (%s)' % (email, subject)
     if config.email.use_mandrill:
         import flask
         from flask.ext.mandrill import Mandrill

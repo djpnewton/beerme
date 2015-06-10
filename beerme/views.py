@@ -65,10 +65,17 @@ def beer():
     beer = beerme.beer_add(brew, table, name, price_satoshis)
     if not beer:
         return 'error creating payment address'
+    return redirect('/beer/%s' % beer.guid)
+
+@app.route('/beer/<guid>')
+def beer_specific(guid):
+    beer = Beer.query.filter_by(guid=guid).first()
+    if not beer:
+        return 'invalid order'
     # convert price to btc
-    price_btc = decimal.Decimal(price_satoshis) / decimal.Decimal(beerme.SATOSHIS)
+    price_btc = decimal.Decimal(beer.price_satoshis) / decimal.Decimal(beerme.SATOSHIS)
     # create qr code
-    qr = utils.qrcode(beer.address, price_btc, brew)
+    qr = utils.qrcode(beer.address, price_btc, beer.brew)
     img_buf = utils.qrcode_png_buffer(qr)
     img_data = img_buf.getvalue()
     img_data_b64 = img_data.encode('base64').replace('\n', '')

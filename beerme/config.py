@@ -20,6 +20,7 @@ class Config():
         self.main.db_connection = config.get('main', 'db_connection')
         self.main.paginate_row_count = config.getint('main', 'paginate_row_count')
         self.main.payment_address = config.get('main', 'payment_address')
+        self.main.beer_price = config.getfloat('main', 'beer_price')
         self.main.payment_secret = config.get('main', 'payment_secret')
 
         # email

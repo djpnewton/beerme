@@ -14,6 +14,7 @@ import random
 import decimal
 import uuid
 import requests
+import urllib
 
 import config
 
@@ -96,10 +97,16 @@ def beer_callback_url(guid):
     return callback_url
 
 def beer_new_address(guid):
-    bci_reqister_url = 'https://blockchain.info/api/receive?method=create&address=%s&callback=%s' % (config.main.payment_address, beer_callback_url(guid))
+    callback_url = beer_callback_url(guid)
+    bci_reqister_url = 'https://blockchain.info/api/receive?method=create&address=%s&callback=%s' % (config.main.payment_address, urllib.quote_plus(callback_url))
+    print 'callback_url:', callback_url
+    print 'bci_reqister_url:', bci_reqister_url
     r = requests.get(bci_reqister_url)
     if r.status_code == 200:
         json = r.json()
+        print 'returned callback_url:', json['callback_url']
+        if json['callback_url'] != callback_url:
+            return None
         return json['input_address']
 
 def beer_price():
@@ -107,7 +114,7 @@ def beer_price():
     r = requests.get(bbb_url)
     if r.status_code == 200:
         rate = r.json()['rate']
-        beer_price_nzd = 9.0
+        beer_price_nzd = config.main.beer_price
         # convert to satoshis
         return int(beer_price_nzd / rate * SATOSHIS)
 
@@ -129,15 +136,28 @@ def beer_payment(req):
     txid = req.args.get('input_transaction_hash', '')
     guid = req.args.get('beer_guid', '')
     secret = req.args.get('secret', '')
-
+    print 'satoshis:', satoshis
+    print 'txid:', txid
+    print 'guid:', guid
+    print 'secret:', secret
+    if secret != config.main.payment_secret:
+        print 'secret (%s) does not match payment_secret' % secret
+        return
     beer = Beer.query.filter_by(guid=guid).first()
-    if beer:
-        if address == beer.address and satoshis >= beer.price_satoshis:
-            beer.txid = txid
-            beer.paid = True
-            db.session.add(beer)
-            db.session.commit()
-            # send email
-            utils.send_email_beer_alert(config, beer)
+    if not beer:
+        print 'invalid beer guid'
+        return
+    if address != beer.address:
+        print 'invalid address'
+        return
+    if satoshis < beer.price_satoshis:
+        print 'payment insufficient'
+        return
+    beer.txid = txid
+    beer.paid = True
+    db.session.add(beer)
+    db.session.commit()
+    # send email
+    utils.send_email_beer_alert(config, beer)
 
 import beerme.views
