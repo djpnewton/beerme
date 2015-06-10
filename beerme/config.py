@@ -22,6 +22,7 @@ class Config():
         self.main.payment_address = config.get('main', 'payment_address')
         self.main.beer_price = config.getfloat('main', 'beer_price')
         self.main.payment_secret = config.get('main', 'payment_secret')
+        self.main.blockcypher_token = config.get('main', 'blockcypher_token')
 
         # email
         self.email = BunchOParams()

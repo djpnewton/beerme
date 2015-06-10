@@ -14,7 +14,7 @@ import random
 import decimal
 import uuid
 import requests
-import urllib
+import json
 
 import config
 
@@ -98,16 +98,17 @@ def beer_callback_url(guid):
 
 def beer_new_address(guid):
     callback_url = beer_callback_url(guid)
-    bci_reqister_url = 'https://blockchain.info/api/receive?method=create&address=%s&callback=%s' % (config.main.payment_address, urllib.quote_plus(callback_url))
+    bc_payment_url = 'https://api.blockcypher.com/v1/btc/main/payments'
+    payload = {'token': config.main.blockcypher_token, 'destination': config.main.payment_address, 'callback_url': callback_url}
     print 'callback_url:', callback_url
-    print 'bci_reqister_url:', bci_reqister_url
-    r = requests.get(bci_reqister_url)
+    print 'bc_payment_url:', bc_payment_url
+    r = requests.post(bc_payment_url, data=json.dumps(payload))
     if r.status_code == 200:
-        json = r.json()
-        print 'returned callback_url:', json['callback_url']
-        if json['callback_url'] != callback_url:
+        data = r.json()
+        print 'returned callback_url:', data['callback_url']
+        if data['callback_url'] != callback_url or data['destination'] != config.main.payment_address:
             return None
-        return json['input_address']
+        return data['input_address']
 
 def beer_price():
     bbb_url = 'https://bitpay.com/api/rates/nzd'
@@ -131,11 +132,12 @@ def beer_add(brew, table, name, price_satoshis):
     return beer
 
 def beer_payment(req):
-    satoshis = int(req.args.get('value', 0))
-    address = req.args.get('destination_address', '')
-    txid = req.args.get('input_transaction_hash', '')
-    guid = req.args.get('beer_guid', '')
-    secret = req.args.get('secret', '')
+    json = req.get_json(force=True)
+    satoshis = json['value']
+    address = json['destination_address']
+    txid = json['input_transaction_hash']
+    guid = req.args.get('beer_guid')
+    secret = req.args.get('secret')
     print 'satoshis:', satoshis
     print 'txid:', txid
     print 'guid:', guid
