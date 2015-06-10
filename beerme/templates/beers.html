@@ -17,7 +17,7 @@
             </thead>
             {% for beer in beers %}
             <tr>
-                <td>{{beer['id']}}</td>
+                <td><a href="/beer/{{beer['guid']}}">{{beer['id']}}</a></td>
                 <td>{{beer['brew']}}</td>
                 <td>{{beer['table']}}</td>
                 <td>{{beer['name']}}</td>
