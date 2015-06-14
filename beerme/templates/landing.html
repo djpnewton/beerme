@@ -8,23 +8,12 @@
 
         <div class="container">
 
-            <div class="row">
-                <form action="/beer">
-                    <input type="hidden" name="brew" value="Pilsner"/>
-                    <input name="table" placeholder="table number" required/>
-                    <input name="name" placeholder="name" required/>
-                    <input type="submit" value="Order Pilsner"/>
-                </form>
-            </div>
-
-            <div class="row">
-                <form action="/beer">
-                    <input type="hidden" name="brew" value="Stout"/>
-                    <input name="table" placeholder="table number" required/>
-                    <input name="name" placeholder="name" required/>
-                    <input type="submit" value="Order Stout"/>
-                </form>
-            </div>
+            {% import 'beer_form.html' as bf %}
+            {{ bf.beer_form('American Amber Ale', table, name) }}
+            {{ bf.beer_form('Black Duck Porter', table, name) }}
+            {{ bf.beer_form('Hawkes Bay Pilsner', table, name) }}
+            {{ bf.beer_form('Pured Brewed Lager', table, name) }}
+            {{ bf.beer_form('Kingston Apple Cider', table, name) }}
 
         </div>
         <!-- /.container -->

@@ -52,7 +52,7 @@ def paginate_pagenums(row_count):
 
 @app.route('/', methods=('GET',))
 def landing():
-    return render_template('landing.html')
+    return render_template('landing.html', table=request.cookies.get('table'), name=request.cookies.get('name'))
 
 @app.route('/beer')
 def beer():
@@ -65,7 +65,10 @@ def beer():
     beer = beerme.beer_add(brew, table, name, price_satoshis)
     if not beer:
         return 'error creating payment address'
-    return redirect('/beer/%s' % beer.guid)
+    resp = redirect('/beer/%s' % beer.guid)
+    resp.set_cookie('table', table)
+    resp.set_cookie('name', name)
+    return resp
 
 @app.route('/beer/<guid>')
 def beer_specific(guid):
