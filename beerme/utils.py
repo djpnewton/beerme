@@ -1,8 +1,8 @@
 from qrcode import QRCode
 
-def qrcode(address, amount, message):
+def qrcode(msg):
     qr = QRCode()
-    qr.add_data('bitcoin:%s?amount=%s&message=%s' % (address, amount, message))
+    qr.add_data(msg)
     return qr
 
 def qrcode_png_buffer(qr):

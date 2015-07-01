@@ -1,5 +1,6 @@
 from flask import url_for, session, request, render_template, redirect, flash, jsonify
 import decimal
+import urllib
 
 import beerme
 from beerme import app, config, csrf
@@ -78,12 +79,13 @@ def beer_specific(guid):
     # convert price to btc
     price_btc = decimal.Decimal(beer.price_satoshis) / decimal.Decimal(beerme.SATOSHIS)
     # create qr code
-    qr = utils.qrcode(beer.address, price_btc, beer.brew)
+    bitcoin_uri = 'bitcoin:%s?%s' % (beer.address, urllib.urlencode({'amount': price_btc, 'message': beer.brew}))
+    qr = utils.qrcode(bitcoin_uri)
     img_buf = utils.qrcode_png_buffer(qr)
     img_data = img_buf.getvalue()
     img_data_b64 = img_data.encode('base64').replace('\n', '')
     data_uri = 'data:image/png;base64,%s' % img_data_b64
-    return render_template('beer.html', beer=beer, price_btc=price_btc, data_uri=data_uri)
+    return render_template('beer.html', beer=beer, price_btc=price_btc, data_uri=data_uri, bitcoin_uri=bitcoin_uri)
 
 @csrf.exempt
 @app.route('/payment', methods=['POST'])
